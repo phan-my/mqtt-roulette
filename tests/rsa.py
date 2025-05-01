@@ -16,7 +16,7 @@ def powermod(n, exponent, m):
     for i in range(1, bitLength + 1):
         Equiv.append((Equiv[i - 1]**2) % m)
 
-        if exponent % 2 == 1:
+        if is_odd(exponent):
             out *= Equiv[i - 1]
             out = out % m
         
@@ -44,7 +44,7 @@ def is_prime(n):
 
 # check natural for odd parity
 def is_odd(n):
-    if n % 2 == 1:
+    if n & 1:
         return True
     return False
 
@@ -53,7 +53,7 @@ def is_odd(n):
 def is_probable_prime(n):
     if n == 2:
         return True
-    if n % 2 == 0:
+    if not n & 1:
         print("what did i tell u? n must be odd.")
         return False
 
@@ -63,7 +63,7 @@ def is_probable_prime(n):
 
     while n - 1 != 2**s * d:
         if (n - 1) % 2**s == 0:
-            if is_odd((n - 1) / 2**s):
+            if is_odd(int((n - 1) / 2**s)):
                 d = int((n - 1) / 2**s)
                 continue
         d = 1
