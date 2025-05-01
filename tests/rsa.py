@@ -2,6 +2,7 @@ from random import randint, choice
 from math import sqrt, floor, log2
 import math
 UPPER = 10**22 + 1
+UPPER_RANDOM = 10**16
 
 def powermod(n, exponent, m):
     # n**exponent % m
@@ -86,13 +87,13 @@ def is_probable_prime(n):
             return False
     return True
 
-n = 10**22 + 1
+"""n = 10**22 + 1
 if is_probable_prime(n):
     tmp = "True"
 else:
     tmp = "False"
-
 print(n, tmp)
+"""
 
 def random_prime(minPrime, maxPrime):
     if maxPrime <= 999983:
@@ -103,6 +104,29 @@ def random_prime(minPrime, maxPrime):
         while is_prime(r) == False:
             r = randint(minPrime, maxPrime)
         return r
+
+def random_probable_prime(minPrime, maxPrime):
+    # for very small primes
+    Primes = [int(x) for x in open("Primes").read().split()]
+    if maxPrime <= 999983:
+        return choice(Primes)
+
+    smallPrime = False
+    while True:
+        out = randint(minPrime, maxPrime)
+        # check for first few primes
+        for i in range(10):
+            if out % Primes[i] == 0:
+                smallPrime = True
+                break
+        if smallPrime:
+            smallPrime = False
+            continue
+#        print("attempt", out)
+        if is_probable_prime(out):
+            return out
+
+# print(random_probable_prime(10**15, UPPER_RANDOM))
 
 # Sieve of Eratosthenes
 # Code by David Eppstein, UC Irvine, 28 Feb 2002
@@ -205,9 +229,9 @@ print(choice(Primes))
 
 # Key generation
 minPrime = 2**32
-maxPrime = 2**50
-p = random_prime(minPrime, maxPrime)
-q = random_prime(minPrime, maxPrime)
+maxPrime = UPPER_RANDOM
+p = random_probable_prime(minPrime, maxPrime)
+q = random_probable_prime(minPrime, maxPrime)
 n = p*q
 phi = phi_prime(p, q)
 
@@ -218,7 +242,7 @@ while gcd(phi, e) != 1:
 d = phi + extended_gcd_b(phi, e)
 
 print("PRIVATE.")
-print("p*q = " + str(p) + "*" + str(q))
+print("p*q = " + str(p) + "*\n\t" + str(q))
 print("phi = " + str(phi))
 print("d = " + str(d))
 print("")
@@ -229,7 +253,7 @@ print("e = " + str(e))
 
 print("d*e equiv", d*e % phi, "mod phi")
 
-m = 123
+m = 0xFFFFFFFFFFFFFFFFFFFFFFFF
 c = powermod(m, e, n)
 
 print("Encrypted text: " + str(c))
