@@ -1,6 +1,27 @@
 from random import randint, choice
 from math import sqrt, floor, log2
 import math
+UPPER = 10**22 + 1
+
+def powermod(n, exponent, m):
+    # n**exponent % m
+    bitLength = int(floor(log2(exponent) + 1))
+
+    Equiv = []
+
+    out = 1
+    Equiv.append(n % m)
+
+    for i in range(1, bitLength + 1):
+        Equiv.append((Equiv[i - 1]**2) % m)
+
+        if exponent % 2 == 1:
+            out *= Equiv[i - 1]
+            out = out % m
+        
+        exponent = exponent >> 1
+    
+    return (out + m) % m
 
 def is_prime(n):
     Primes = [int(x) for x in open("Primes").read().split()]
@@ -19,6 +40,59 @@ def is_prime(n):
                 return False
     
     return True
+
+# check natural for odd parity
+def is_odd(n):
+    if n % 2 == 1:
+        return True
+    return False
+
+# Miller-Rabin
+# n must be odd, please ftlog
+def is_probable_prime(n):
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        print("what did i tell u? n must be odd.")
+        return False
+
+    # s > 0 and d odd > 0 where n - 1 = 2^{s}d
+    s = 1
+    d = 1
+
+    while n - 1 != 2**s * d:
+        if (n - 1) % 2**s == 0:
+            if is_odd((n - 1) / 2**s):
+                d = int((n - 1) / 2**s)
+                continue
+        d = 1
+        s += 1
+#        print("s, d:", s, d)
+
+#    print("n, s, d:", n, s, d)
+
+    # main loop
+    k = 64
+    for i in range(k):
+        a = randint(2, n - 2)
+        x = powermod(a, d, n)
+        for j in range(s):
+            y = powermod(x, 2, n)
+            # nontrivial sqrt(1) % n
+            if y == 1 and x != 1 and x != n - 1:
+                return False
+            x = y
+        if y != 1:
+            return False
+    return True
+
+n = 10**22 + 1
+if is_probable_prime(n):
+    tmp = "True"
+else:
+    tmp = "False"
+
+print(n, tmp)
 
 def random_prime(minPrime, maxPrime):
     if maxPrime <= 999983:
@@ -128,27 +202,6 @@ for q in gen_primes(maxPrime):
 
 print(choice(Primes))
 """
-
-
-def powermod(n, exponent, m):
-    # n**exponent % m
-    bitLength = int(floor(log2(exponent) + 1))
-
-    Equiv = []
-
-    out = 1
-    Equiv.append(n % m)
-
-    for i in range(1, bitLength + 1):
-        Equiv.append((Equiv[i - 1]**2) % m)
-
-        if exponent % 2 == 1:
-            out *= Equiv[i - 1]
-            out = out % m
-        
-        exponent = exponent >> 1
-    
-    return (out + m) % m
 
 # Key generation
 minPrime = 2**32
